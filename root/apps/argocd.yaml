@@ -13,14 +13,27 @@ spec:
       values: |
         fullnameOverride: "argocd"
         
-        # Das hier ist die Brücke zu deiner manuellen Installation
-        global:
-          additionalLabels:
-            app.kubernetes.io/instance: argocd
-            
         server:
           extraArgs:
             - --insecure
+          # Hier binden wir deinen Ingress fest in Helm ein:
+          ingress:
+            enabled: true
+            annotations:
+              cert-manager.io/cluster-issuer: "letsencrypt-prod"
+              traefik.ingress.kubernetes.io/router.entrypoints: "websecure"
+              traefik.ingress.kubernetes.io/router.tls: "true"
+              traefik.ingress.kubernetes.io/service.serversscheme: "http"
+            hosts:
+              - jakob-argocd.goava.ai
+            tls:
+              - secretName: argocd-server-tls
+                hosts:
+                  - jakob-argocd.goava.ai
+
+        global:
+          additionalLabels:
+            app.kubernetes.io/instance: argocd
             
   destination:
     server: https://kubernetes.default.svc
@@ -30,7 +43,6 @@ spec:
     automated:
       prune: true
       selfHeal: true
-    # Erlaubt Argo, bestehende Ressourcen sanfter zu übernehmen
     syncOptions:
       - CreateNamespace=true
       - ServerSideApply=true
