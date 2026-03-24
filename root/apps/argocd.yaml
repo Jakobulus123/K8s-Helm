@@ -1,0 +1,27 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: argocd-self-deployment
+  namespace: argocd
+spec:
+  project: default
+  source:
+    # Wir nutzen das offizielle Argo CD Helm Chart
+    repoURL: https://argoproj.github.io/argo-helm
+    chart: argo-cd
+    targetRevision: 7.3.11
+    helm:
+      values: |
+        server:
+          # Wir lassen Ingress DEAKTIVIERT, da du über den Tunnel kommst
+          ingress:
+            enabled: false
+          # Falls du später mal ein echtes Zertifikat hast, 
+          # ändern wir das hier einfach in Git.
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: argocd
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
