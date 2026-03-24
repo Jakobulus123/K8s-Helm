@@ -6,18 +6,17 @@ metadata:
 spec:
   project: default
   source:
-    # Wir nutzen das offizielle Argo CD Helm Chart
     repoURL: https://argoproj.github.io/argo-helm
     chart: argo-cd
     targetRevision: 7.3.11
     helm:
       values: |
+        # --- DAS IST DER ENTSCHEIDENDE FIX ---
+        fullnameOverride: "argocd"
+        # --------------------------------------
         server:
-          # Wir lassen Ingress DEAKTIVIERT, da du über den Tunnel kommst
-          ingress:
-            enabled: false
-          # Falls du später mal ein echtes Zertifikat hast, 
-          # ändern wir das hier einfach in Git.
+          extraArgs:
+          - --insecure
   destination:
     server: https://kubernetes.default.svc
     namespace: argocd
