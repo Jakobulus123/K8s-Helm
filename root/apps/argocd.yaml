@@ -1,1 +1,31 @@
-x
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: argocd-self-deployment
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://argoproj.github.io/argo-helm
+    chart: argo-cd
+    targetRevision: 7.3.11
+    helm:
+      values: |
+        # WICHTIG: Das sorgt dafür, dass die Namen zu deinen alten Pods passen
+        fullnameOverride: "argocd"
+        server:
+          extraArgs:
+          - --insecure
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: argocd
+  ignoreDifferences:
+  - group: ""
+    kind: Secret
+    name: argocd-initial-admin-secret
+    jsonPointers:
+    - /data
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
