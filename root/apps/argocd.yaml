@@ -11,21 +11,33 @@ spec:
     targetRevision: 7.3.11
     helm:
       values: |
-        # WICHTIG: Das sorgt dafür, dass die Namen zu deinen alten Pods passen
         fullnameOverride: "argocd"
+        
+        # Das hier ist die Brücke zu deiner manuellen Installation
+        global:
+          additionalLabels:
+            app.kubernetes.io/instance: argocd
+            
         server:
           extraArgs:
-          - --insecure
+            - --insecure
+            
   destination:
     server: https://kubernetes.default.svc
     namespace: argocd
-  ignoreDifferences:
-  - group: ""
-    kind: Secret
-    name: argocd-initial-admin-secret
-    jsonPointers:
-    - /data
+    
   syncPolicy:
     automated:
       prune: true
       selfHeal: true
+    # Erlaubt Argo, bestehende Ressourcen sanfter zu übernehmen
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true
+
+  ignoreDifferences:
+    - group: ""
+      kind: Secret
+      name: argocd-initial-admin-secret
+      jsonPointers:
+        - /data
