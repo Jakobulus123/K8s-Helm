@@ -1,0 +1,24 @@
+cat <<EOF > apps/hcloud-ccm.yaml
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: hcloud-ccm
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://charts.hetzner.cloud
+    chart: hcloud-cloud-controller-manager
+    targetRevision: 1.20.0
+    helm:
+      values: |
+        networking:
+          enabled: true
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: kube-system
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+EOF
