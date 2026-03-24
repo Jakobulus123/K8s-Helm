@@ -6,7 +6,7 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: git@github.com:Jakobulus123/Cluster-Test-Jakob.git
+    repoURL: git@github.com:Jakobulus123/K8s-Helm.git
     targetRevision: HEAD
     path: ClusterManager/argocd-chart
     helm:
