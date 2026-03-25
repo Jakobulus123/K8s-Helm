@@ -1,3 +1,0 @@
-argo-cd:
-  server:
-    insecure: true

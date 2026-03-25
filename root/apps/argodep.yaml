@@ -3,11 +3,7 @@ kind: Deployment
 metadata:
   name: argocd-server
   namespace: argocd
-  labels:
-    app.kubernetes.io/name: argocd-server
-    app.kubernetes.io/component: server
 spec:
-  replicas: 1
   selector:
     matchLabels:
       app.kubernetes.io/name: argocd-server
@@ -18,16 +14,9 @@ spec:
     spec:
       containers:
       - name: argocd-server
-        image: quay.io/argoproj/argocd:v2.11.7
+        image: quay.io/argoproj/argocd:v2.11.7 # Exakt die Version aus deinem Cluster
         env:
         - name: ARGOCD_SERVER_INSECURE
-          value: "true"
+          value: "true" # Damit er auf 8080 ohne TLS antwortet
         ports:
         - containerPort: 8080
-        - containerPort: 8083
-        readinessProbe:
-          httpGet:
-            path: /healthz
-            port: 8080
-          initialDelaySeconds: 3
-          periodSeconds: 30
