@@ -13,7 +13,7 @@ spec:
       values: |
         server:
           extraArgs:
-            - --insecure
+           
           ingress:
             enabled: true
             ingressClassName: traefik
