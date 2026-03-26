@@ -2,6 +2,11 @@
 # DEINE KORRIGIERTE ARGO CD VALUES.YAML
 # -------------------------------------------------------------------------
 
+
+networkPolicies:
+  enabled: false
+
+
 global:
   domain: jakob-argocd.goava.ai
 
