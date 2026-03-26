@@ -1,26 +1,30 @@
 # -------------------------------------------------------------------------
-# DEINE ARGO CD VALUES.YAML
-# Domain: jakob-argocd.goava.ai
-# Ingress: Traefik
+# DEINE KORRIGIERTE ARGO CD VALUES.YAML
 # -------------------------------------------------------------------------
 
 global:
   domain: jakob-argocd.goava.ai
 
 server:
-  # Deaktiviert das interne Argo CD HTTPS, da Traefik das übernimmt
   extraArgs:
     - --insecure
-    
+
   ingress:
     enabled: true
-    # Hier ist die wichtige Änderung für deinen Cluster:
-    ingressClassName: traefik 
+    ingressClassName: traefik
     
-    # Falls du cert-manager nutzt (lass es drin, falls ja. Wenn nicht, stört es meistens auch nicht)
+    # --- DIESE ZEILE FEHLTE UND IST DER GRUND FÜR "NO AVAILABLE SERVER" ---
+    https: false 
+    # ----------------------------------------------------------------------
+
     annotations:
-      cert-manager.io/cluster-issuer: letsencrypt-prod 
-      
+      cert-manager.io/cluster-issuer: letsencrypt-prod
+      # --- DEINE TRAEFIK SPEZIFISCHEN ANNOTATIONS ---
+      traefik.ingress.kubernetes.io/router.entrypoints: websecure
+      traefik.ingress.kubernetes.io/router.tls: "true"
+      traefik.ingress.kubernetes.io/service.serversscheme: http
+      # ----------------------------------------------
+
     hosts:
       - jakob-argocd.goava.ai
     tls:
