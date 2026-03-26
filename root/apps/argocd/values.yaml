@@ -1,35 +1,36 @@
-# -------------------------------------------------------------------------
-# DEINE KORRIGIERTE ARGO CD VALUES.YAML
-# -------------------------------------------------------------------------
-
-
+# 1. Die internen "Firewalls" abschalten (wie in der Plain-YAML)
 networkPolicies:
   enabled: false
 
-
+# 2. Globale Domain setzen
 global:
   domain: jakob-argocd.goava.ai
 
 server:
+  # 3. Den Insecure-Modus erzwingen (wie in deiner ConfigMap gesehen)
   extraArgs:
     - --insecure
+  
+  # 4. Die Service-Ports synchronisieren
+  service:
+    servicePortHttp: 80
+    servicePortHttps: 443 # Traefik nutzt oft 443, wir leiten es intern auf 8080 weiter
 
   ingress:
     enabled: true
     ingressClassName: traefik
     
-    # --- DIESE ZEILE FEHLTE UND IST DER GRUND FÜR "NO AVAILABLE SERVER" ---
+    # DIESE ZEILE IST DER SCHLÜSSEL:
+    # Sie zwingt den Ingress, Port 80 (HTTP) des Services zu nutzen
     https: false 
-    # ----------------------------------------------------------------------
 
     annotations:
       cert-manager.io/cluster-issuer: letsencrypt-prod
-      # --- DEINE TRAEFIK SPEZIFISCHEN ANNOTATIONS ---
+      # Traefik mitteilen, dass der Server dahinter KEIN SSL spricht
       traefik.ingress.kubernetes.io/router.entrypoints: websecure
       traefik.ingress.kubernetes.io/router.tls: "true"
       traefik.ingress.kubernetes.io/service.serversscheme: http
-      # ----------------------------------------------
-
+      
     hosts:
       - jakob-argocd.goava.ai
     tls:
@@ -37,6 +38,7 @@ server:
         hosts:
           - jakob-argocd.goava.ai
 
+# 5. Die ConfigMap-Werte setzen (die wir vorhin ausgelesen haben)
 configs:
   params:
     server.insecure: true
