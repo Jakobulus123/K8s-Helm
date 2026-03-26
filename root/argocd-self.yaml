@@ -1,0 +1,30 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: argocd               # Der Name der App in Argo CD
+  namespace: argocd          # Der Namespace, in dem Argo CD installiert ist
+spec:
+  project: default
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: argocd
+  
+  # Hier ist der "Multiple Sources" Zauber:
+  sources:
+    # Quelle 1: Das offizielle Helm Chart aus dem Internet
+    - repoURL: https://argoproj.github.io/argo-helm
+      chart: argo-cd
+      targetRevision: 9.4.*  # WICHTIG: Hier die Version eintragen, die du nutzen willst
+      helm:
+        valueFiles:
+          - $values/argocd/values.yaml  # Er verweist auf den Ordner/Datei aus Quelle 2!
+          
+    # Quelle 2: Dein eigenes GitHub Repository
+    - repoURL: https://github.com/Jakubulus123/K8s-Helm.git  # <-- HIER DEINE GITHUB URL REIN
+      targetRevision: main                                 # <-- Dein Branch (main oder master)
+      ref: values
+      
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true         # <-- Das aktiviert die Selbstheilung!

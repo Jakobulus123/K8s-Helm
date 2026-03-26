@@ -1,8 +1,0 @@
-metadata:
-  name: argocd-server-ingress
-  namespace: argocd
-  annotations:
-    traefik.ingress.kubernetes.io/router.entrypoints: websecure
-    traefik.ingress.kubernetes.io/router.tls: "true"
-    # Diese Zeile sagt Traefik: "Der Pod dahinter spricht kein HTTPS, nimm HTTP"
-    traefik.ingress.kubernetes.io/service.serversscheme: http
