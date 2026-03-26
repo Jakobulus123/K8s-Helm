@@ -1,22 +1,26 @@
-# Alles unter 'argo-cd', da es eine Dependency ist
 argo-cd:
-  # 1. SERVER AUF HTTP (INSECURE) STELLEN
+  # 1. GLOBAL: Wir sagen Argo CD, dass wir KEIN TLS wollen
+  configs:
+    params:
+      server.insecure: "true"
+
   server:
+    # 2. Wir geben das Flag ZUSÄTZLICH mit (Doppelt hält besser)
     extraArgs:
       - --insecure
-    
-    # 2. INGRESS FÜR TRAEFIK ANPASSEN
+
     ingress:
       enabled: true
-      ingressClassName: traefik # <-- Geändert von nginx auf traefik
-      https: false              # WICHTIG: Sagt dem Ingress, er soll Port 80 nutzen
+      ingressClassName: traefik
+      # 3. WICHTIG: Der Ingress soll jetzt den HTTP-Port nutzen
+      https: false 
       
       annotations:
         cert-manager.io/cluster-issuer: letsencrypt-prod
-        # TRAEFIK SPEZIFISCHE ANNOTATIONS (Übersetzt von Nginx):
         traefik.ingress.kubernetes.io/router.entrypoints: websecure
         traefik.ingress.kubernetes.io/router.tls: "true"
-        traefik.ingress.kubernetes.io/service.serversscheme: http # Das ist das "backend-protocol: HTTP" für Traefik
+        # 4. Traefik sagen: "Sprich Klartext (HTTP) mit dem Pod"
+        traefik.ingress.kubernetes.io/service.serversscheme: http
 
       hosts:
         - jakob-argocd.goava.ai
@@ -25,11 +29,6 @@ argo-cd:
           hosts:
             - jakob-argocd.goava.ai
 
-  # 3. NETZWERK-MAUERN EINREISSEN
+  # 5. NetworkPolicies aus, damit der Traffic fließen kann
   networkPolicies:
     enabled: false
-
-  # 4. CONFIG-PARAMETER SETZEN
-  configs:
-    params:
-      server.insecure: "true"
