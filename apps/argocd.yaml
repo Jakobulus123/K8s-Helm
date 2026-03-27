@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: argocd
+  name: argocd-bootstrap   # ❗ NICHT argocd
   namespace: argocd
 spec:
   project: default
@@ -12,7 +12,7 @@ spec:
     targetRevision: 5.51.6
 
     helm:
-      releaseName: argocd   # 🔥 DAS IST DER FIX
+      releaseName: argocd   # bleibt so!
       values: |
         global:
           nameOverride: argocd
@@ -34,7 +34,7 @@ spec:
 
   destination:
     server: https://kubernetes.default.svc
-    namespace: argocd
+    namespace: argocd   # korrekt für Argo selbst
 
   syncPolicy:
     automated:
