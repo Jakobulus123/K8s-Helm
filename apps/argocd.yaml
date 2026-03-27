@@ -7,7 +7,7 @@ spec:
   project: default
 
   source:
-    repoURL: https://github.com/DEIN-REPO/argocd-gitops
+    repoURL: git@github.com:Jakobulus123/K8s-Helm.git
     targetRevision: HEAD
     path: .
 
