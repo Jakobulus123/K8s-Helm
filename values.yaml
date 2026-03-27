@@ -1,0 +1,13 @@
+server:
+  extraArgs:
+    - --insecure   # wichtig für Traefik Setup
+
+configs:
+  params:
+    server.insecure: true
+
+  cm:
+    url: https://jakob-argocd.goava.ai
+
+ingress:
+  enabled: false   # wir nutzen Traefik selbst
