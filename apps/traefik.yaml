@@ -3,6 +3,7 @@ kind: Application
 metadata:
   name: traefik
   namespace: argocd
+
 spec:
   project: default
 
@@ -31,3 +32,6 @@ spec:
     automated:
       prune: true
       selfHeal: true
+
+    syncOptions:
+      - CreateNamespace=true   # 🔥 DAS FEHLT BEI DIR
