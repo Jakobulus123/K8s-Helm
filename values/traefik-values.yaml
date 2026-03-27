@@ -1,9 +1,59 @@
 providers:
   kubernetesIngress:
     enabled: true
+    publishedService:
+      enabled: true
 
+# 🌐 Ports
 ports:
   web:
     port: 80
+    expose: true
   websecure:
     port: 443
+    expose: true
+
+# 🌍 Service (extern erreichbar)
+service:
+  type: LoadBalancer
+
+# 🔐 RBAC (FIX für dein aktuelles Problem)
+rbac:
+  enabled: true
+
+serviceAccount:
+  create: true
+  name: traefik
+
+# 🔐 EntryPoints + Let's Encrypt
+additionalArguments:
+  - "--entrypoints.web.address=:80"
+  - "--entrypoints.websecure.address=:443"
+
+  # HTTP → HTTPS Redirect
+  - "--entrypoints.web.http.redirections.entrypoint.to=websecure"
+  - "--entrypoints.web.http.redirections.entrypoint.scheme=https"
+
+  # Kubernetes Provider
+  - "--providers.kubernetesingress=true"
+
+  # Let's Encrypt
+  - "--certificatesresolvers.letsencrypt.acme.email=jakob.kampmann@goava.ai"
+  - "--certificatesresolvers.letsencrypt.acme.storage=/data/acme.json"
+  - "--certificatesresolvers.letsencrypt.acme.httpchallenge.entrypoint=web"
+
+# 💾 Persistenz für Zertifikate
+persistence:
+  enabled: true
+  path: /data
+  size: 128Mi
+
+# 📊 Dashboard (optional, aber sehr hilfreich)
+ingressRoute:
+  dashboard:
+    enabled: true
+
+# 🔍 Logs
+logs:
+  general:
+    level: INFO
