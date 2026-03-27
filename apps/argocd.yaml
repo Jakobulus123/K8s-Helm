@@ -12,7 +12,12 @@ spec:
     targetRevision: 5.51.6
 
     helm:
+      releaseName: argocd   # 🔥 DAS IST DER FIX
       values: |
+        global:
+          nameOverride: argocd
+          fullnameOverride: argocd
+
         server:
           extraArgs:
             - --insecure
