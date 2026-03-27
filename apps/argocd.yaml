@@ -1,19 +1,28 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: argocd-self
+  name: argocd
   namespace: argocd
 spec:
   project: default
 
   source:
-    repoURL: git@github.com:Jakobulus123/K8s-Helm.git
-    targetRevision: HEAD
-    path: .
+    repoURL: https://argoproj.github.io/argo-helm
+    chart: argo-cd
+    targetRevision: 5.51.6
 
     helm:
-      valueFiles:
-        - values/argocd-values.yaml
+      values: |
+        server:
+          extraArgs:
+            - --insecure
+
+        configs:
+          params:
+            server.insecure: true
+
+          cm:
+            url: https://jakob-argocd.goava.ai
 
   destination:
     server: https://kubernetes.default.svc
