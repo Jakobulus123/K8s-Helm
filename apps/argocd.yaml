@@ -17,6 +17,9 @@ spec:
           extraArgs:
             - --insecure
 
+          service:
+            type: ClusterIP
+
         configs:
           params:
             server.insecure: true
@@ -32,3 +35,6 @@ spec:
     automated:
       prune: true
       selfHeal: true
+
+    syncOptions:
+      - CreateNamespace=true
