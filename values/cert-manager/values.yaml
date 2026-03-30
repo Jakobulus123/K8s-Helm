@@ -1,9 +1,9 @@
 # cert-manager Helm Values
 # Doku: https://cert-manager.io/docs/installation/helm/
 
-# CRDs werden via installCRDs installiert (empfohlen für GitOps)
+# CRDs separat verwalten um ArgoCD-Drift zu vermeiden
 crds:
-  enabled: true
+  enabled: false
 
 replicaCount: 1
 
