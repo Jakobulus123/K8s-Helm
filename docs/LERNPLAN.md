@@ -1,4 +1,4 @@
-# 6-Wochen Lernplan — Kubernetes, Helm & ArgoCD Internals
+# 7-Wochen Lernplan — Kubernetes, Helm & ArgoCD Internals
 
 > Dieser Plan baut logisch aufeinander auf — jede Woche setzt das Wissen der vorherigen voraus.
 > Vorwissen: Cluster manuell aufgebaut, ArgoCD + GitHub-Workflow bekannt, kubectl grundlegend.
@@ -8,75 +8,103 @@
 
 ## Übersicht
 
-| Woche | Thema | Warum diese Reihenfolge |
-|---|---|---|
-| 1 | Kubernetes Internals | Fundament — alles andere baut darauf auf |
-| 2 | Netzwerk tief | Braucht K8s-Wissen aus Woche 1 |
-| 3 | Helm — Verstehen & Struktur | Braucht K8s-Objekte & YAML aus Woche 1–2 |
-| 4 | Helm — Tief & Sicher anwenden | Baut direkt auf Woche 3 auf |
-| 5 | ArgoCD Internals | Braucht K8s + Helm + Netzwerk aus Woche 1–4 |
-| 6 | Alles zusammen | Synthese — die komplette Prozesskette |
+| Woche | Thema | Tage | Warum diese Zeit |
+|---|---|---|---|
+| 1 | K8s Control Plane & Reconciliation | 5 | Fundament für alles — zu schnell = alles später unklar |
+| 2 | K8s Workloads, Config, Storage, RBAC | 5 | Vervollständigt K8s-Wissen — fehlt im Cluster sonst als Lücke |
+| 3 | Netzwerk tief | 5 | OSI allein hat 905 Zeilen — braucht eigene Woche |
+| 4 | Helm — Basics & Struktur | 5 | Helm rendert K8s-YAML — erst nach Woche 1+2 sinnvoll |
+| 5 | Helm — Advanced & sicher anwenden | 5 | Baut direkt auf Woche 4 auf, größte Datei im Repo |
+| 6 | ArgoCD Internals | 5 | Braucht K8s + Helm + Netzwerk als Vorwissen |
+| 7 | Synthese — alles zusammen | 5 | Prozesskette komplett, HOW-TO-CREATE, Lücken schließen |
+
+**Gesamt: 7 Wochen — alle Dateien vollständig abgedeckt**
 
 ---
 
-## Woche 1 — Kubernetes von innen
+## Woche 1 — K8s Control Plane & Reconciliation
 
-**Ziel:** Verstehen was passiert wenn du `kubectl apply` drückst
+**Ziel:** Verstehen was im Hintergrund passiert wenn du `kubectl apply` drückst
+
+> Warum eine ganze Woche: Das ist das Fundament für Helm, ArgoCD und Netzwerk.
+> Wer hier zu schnell drüber liest, versteht später nicht warum Dinge kaputt gehen.
 
 | Tag | Aufgabe | Quelle |
 |---|---|---|
-| Mo | API-Server, etcd, Controller-Manager — was macht welche Komponente | `K8s-lernen-verstehen-verbindungen.md` Kap. 2–3 |
-| Di | Reconciliation Loop: wie K8s Desired State vs. Actual State überwacht | `K8s-lernen-verstehen-verbindungen.md` Kap. 4 |
-| Mi | Was passiert intern bei `kubectl apply`: API-Server → etcd → Scheduler → kubelet | `WIE-ALLES-ZUSAMMENHAENGT.md` Kap. 4 |
-| Do | Workload-Objekte tief: ReplicaSet, Deployment, wie Rolling Update intern funktioniert | `K8s-lernen-verstehen-verbindungen.md` Kap. 4 |
-| Fr | Praxis: `kubectl get events -w` beim Deployment beobachten — jeden Schritt live sehen | — |
+| Mo | API-Server: was er ist, warum alles über ihn läuft, wie er Anfragen validiert | `K8s-lernen-verstehen-verbindungen.md` Kap. 2 |
+| Di | etcd: wo K8s seinen State speichert — warum etcd = Gehirn des Clusters | `K8s-lernen-verstehen-verbindungen.md` Kap. 2 |
+| Mi | Scheduler + Controller-Manager: wer entscheidet wo Pods landen und wer sie überwacht | `K8s-lernen-verstehen-verbindungen.md` Kap. 2–3 |
+| Do | Reconciliation Loop: Desired State vs. Actual State — das Kernprinzip von K8s | `K8s-lernen-verstehen-verbindungen.md` Kap. 4 |
+| Fr | Praxis: `kubectl get events -w` beim Deployment beobachten — Control Plane live sehen | `SETUP-DOKU.md` Kap. 2 |
 
 ---
 
-## Woche 2 — Netzwerk tief
+## Woche 2 — K8s Workloads, Config, Storage & RBAC
 
-**Ziel:** Jeden Hop eines Requests von Browser bis Pod kennen
+**Ziel:** Alle K8s-Objekte kennen die im Cluster tatsächlich vorkommen
+
+> Warum eigene Woche: Diese Objekte (Secrets, ConfigMaps, PVCs, RBAC) fehlen in
+> den meisten Kurzanleitungen — aber genau hier entstehen die meisten Fehler in der Praxis.
 
 | Tag | Aufgabe | Quelle |
 |---|---|---|
-| Mo | OSI-Modell: Schichten 1–4 verstehen, wo K8s auf welcher Schicht eingreift | `OSI-Modell.md` Kap. 1–4 |
-| Di | kube-proxy, iptables, wie ClusterIP intern funktioniert | `K8s-lernen-verstehen-verbindungen.md` Kap. 5–6 |
-| Mi | Traefik intern: wie er IngressRoutes beobachtet, Reverse-Proxy-Mechanik | `WIE-ALLES-ZUSAMMENHAENGT.md` Kap. 6 |
-| Do | cert-manager intern: ACME-Challenge, wie Let's Encrypt TLS ausstellt | `WIE-ALLES-ZUSAMMENHAENGT.md` Kap. 7 |
-| Fr | Praxis: `kubectl exec` in Pod, mit `curl` und `nslookup` Netzwerk selbst erkunden | — |
+| Mo | Deployment, ReplicaSet, Pod — wie Rolling Update intern abläuft, was passiert bei Absturz | `K8s-lernen-verstehen-verbindungen.md` Kap. 4 |
+| Di | ConfigMaps & Secrets: wie Konfiguration in Pods landet, Unterschied env vs. Volume | `K8s-lernen-verstehen-verbindungen.md` Kap. 8 |
+| Mi | Storage: PersistentVolume, PVC, StorageClass — wie Daten den Pod-Neustart überleben | `K8s-lernen-verstehen-verbindungen.md` Kap. 9 |
+| Do | RBAC: ServiceAccounts, Roles, ClusterRoles — wer darf was im Cluster | `K8s-lernen-verstehen-verbindungen.md` Kap. 10 |
+| Fr | Praxis: `kubectl describe` auf Deployment, ConfigMap, PVC — alles was du gelesen hast live ansehen | `SETUP-DOKU.md` Kap. 3 + 12 |
 
 ---
 
-## Woche 3 — Helm verstehen (Theorie & Struktur)
+## Woche 3 — Netzwerk tief
+
+**Ziel:** Jeden Hop eines Requests von Browser bis Pod lückenlos kennen
+
+> Warum eigene Woche: OSI-Modell allein hat 905 Zeilen. kube-proxy + iptables sind
+> komplex. Traefik + cert-manager brauchen beide eigenen Fokus.
+
+| Tag | Aufgabe | Quelle |
+|---|---|---|
+| Mo | OSI-Modell komplett: alle 7 Schichten, wo K8s auf welcher Schicht eingreift | `OSI-Modell.md` komplett |
+| Di | K8s-Netzwerk intern: kube-proxy, iptables-Regeln, wie ClusterIP und DNS funktionieren | `K8s-lernen-verstehen-verbindungen.md` Kap. 5–6 |
+| Mi | Services tief: ClusterIP vs. NodePort vs. LoadBalancer — wann welcher und warum | `K8s-lernen-verstehen-verbindungen.md` Kap. 6 |
+| Do | Traefik intern: wie er IngressRoutes beobachtet, Reverse-Proxy-Mechanik, Middlewares | `WIE-ALLES-ZUSAMMENHAENGT.md` Kap. 6 |
+| Fr | cert-manager intern: ACME-Challenge-Flow, wie Let's Encrypt TLS ausstellt und erneuert | `WIE-ALLES-ZUSAMMENHAENGT.md` Kap. 7 |
+
+**Praxis am Wochenende (optional):** `kubectl exec` in Pod, mit `curl` und `nslookup` den Netzwerkweg selbst nachverfolgen
+
+---
+
+## Woche 4 — Helm Basics & Struktur
 
 **Ziel:** Helm ist keine Blackbox mehr — verstehen was intern passiert
 
-> Warum erst jetzt: Helm rendert Kubernetes-YAML. Ohne Verständnis von K8s-Objekten (Woche 1)
-> und Netzwerk (Woche 2) macht Helm-Output keinen Sinn.
+> Warum erst jetzt: Helm rendert K8s-YAML. Ohne tiefes K8s-Wissen (Woche 1–2)
+> und Netzwerk (Woche 3) versteht man den Output nicht.
 
 | Tag | Aufgabe | Quelle |
 |---|---|---|
-| Mo | Was Helm ist und warum es existiert: Chart vs. Release vs. Revision | `helm-yaml-lernen.md` Kap. 5 |
-| Di | Chart-Struktur: `Chart.yaml`, `values.yaml`, `templates/` — was liegt wo und warum | `helm-yaml-lernen.md` Kap. 6 |
-| Mi | `values.yaml` tief: Overrides, Hierarchie, `--set` vs. `-f values.yaml` | `helm-yaml-lernen.md` Kap. 8 |
-| Do | Go-Templates: `{{ .Values.x }}`, `{{ .Release.Name }}`, `{{ if }}`, `{{ range }}` | `helm-yaml-lernen.md` Kap. 7 |
-| Fr | Praxis: `helm template <chart> -f values.yaml` — Output Zeile für Zeile lesen | — |
+| Mo | YAML tief: Syntax, Typen, Einrückung, Fallstricke — die Sprache hinter allem | `helm-yaml-lernen.md` Kap. 1–2 |
+| Di | Was Helm ist: Chart vs. Release vs. Revision, warum es existiert | `helm-yaml-lernen.md` Kap. 5 |
+| Mi | Chart-Struktur: `Chart.yaml`, `values.yaml`, `templates/` — was liegt wo und warum | `helm-yaml-lernen.md` Kap. 6 |
+| Do | `values.yaml` tief: Overrides, Hierarchie, `--set` vs. `-f values.yaml` | `helm-yaml-lernen.md` Kap. 8 |
+| Fr | Praxis: `helm template <chart> -f values.yaml` — Output Zeile für Zeile lesen und mit K8s-Wissen zuordnen | — |
 
 ---
 
-## Woche 4 — Helm tief & sicher anwenden
+## Woche 5 — Helm Advanced & sicher anwenden
 
-**Ziel:** Helm-Änderungen ohne Angst durchführen, Fehler selbst debuggen
+**Ziel:** Helm-Änderungen ohne Angst, Fehler selbst debuggen, fremde Charts lesen
 
 | Tag | Aufgabe | Quelle |
 |---|---|---|
-| Mo | Helm Hooks: `pre-install`, `post-upgrade`, `pre-delete` — Reihenfolge & Auswirkungen | `helm-yaml-lernen.md` Kap. 7 |
-| Di | Unbekannte Charts lesen: wie du einen fremden Chart verstehst ohne Doku | `helm-yaml-lernen.md` Kap. 14 |
-| Mi | Häufige Helm-Fehler und ihre Ursachen — warum Cluster kaputtgehen können | `helm-yaml-lernen.md` Kap. 13 |
-| Do | Helm + ArgoCD: wie ArgoCD intern `helm template` aufruft bevor es applied | `helm-yaml-lernen.md` Kap. 9–10 |
-| Fr | Praxis: Eigenen Mini-Chart von Null schreiben, mit `helm template` testen | — |
+| Mo | Go-Templates tief: `{{ .Values.x }}`, `{{ .Release.Name }}`, `{{ if }}`, `{{ range }}`, `{{ include }}` | `helm-yaml-lernen.md` Kap. 7 |
+| Di | Helm Hooks: `pre-install`, `post-upgrade`, `pre-delete` — Reihenfolge und was schiefgehen kann | `helm-yaml-lernen.md` Kap. 7 |
+| Mi | Häufige Helm-Fehler: warum Cluster kaputtgehen, wie man es vorher erkennt | `helm-yaml-lernen.md` Kap. 13 |
+| Do | Unbekannte Charts lesen: wie du einen fremden Chart ohne Doku verstehst | `helm-yaml-lernen.md` Kap. 14 |
+| Fr | Helm + ArgoCD: wie ArgoCD intern `helm template` aufruft — dann eigenen Mini-Chart schreiben und testen | `helm-yaml-lernen.md` Kap. 9–10 |
 
-> **Regel für diese beiden Helm-Wochen:**
+> **Die wichtigste Helm-Regel:**
 > ```
 > helm template → Output prüfen → dann erst helm upgrade
 > ```
@@ -84,61 +112,78 @@
 
 ---
 
-## Woche 5 — ArgoCD Internals
+## Woche 6 — ArgoCD Internals
 
 **Ziel:** Verstehen was ArgoCD unter der Haube macht — nicht wie man es benutzt
 
-> Warum erst jetzt: ArgoCD verwendet intern Helm (Woche 3–4) und kommuniziert über
-> K8s-Netzwerk (Woche 1–2). Ohne dieses Wissen bleibt ArgoCD eine Blackbox.
+> Warum erst jetzt: ArgoCD nutzt intern Helm (Woche 4–5), kommuniziert über
+> K8s-APIs (Woche 1) und Netzwerk (Woche 3). Jetzt macht alles Sinn.
 
 | Tag | Aufgabe | Quelle |
 |---|---|---|
-| Mo | ArgoCD-Komponenten: Application Controller, Repo Server, API Server, Dex — wer macht was | `WIE-ALLES-ZUSAMMENHAENGT.md` Kap. 5 |
-| Di | Reconciliation Loop in ArgoCD: wie er Git-Zustand mit Cluster-Zustand vergleicht | `K8s-lernen-verstehen-verbindungen.md` Kap. 11 |
-| Mi | Custom Resource Definitions (CRDs): was ist eine `Application`-Ressource intern | `helm-yaml-lernen.md` Kap. 9 |
-| Do | Warum OutOfSync entsteht, wie Health-Checks funktionieren, was `Degraded` bedeutet | `FEHLER-DOKU.md` alle Fehler |
-| Fr | Praxis: `kubectl get application -n argocd -o yaml` — rohen State lesen und verstehen | — |
+| Mo | ArgoCD-Komponenten: Application Controller, Repo Server, API Server, Dex — wer macht was intern | `WIE-ALLES-ZUSAMMENHAENGT.md` Kap. 5 |
+| Di | ArgoCD Reconciliation Loop: wie er Git-Zustand mit Cluster-Zustand vergleicht — Schritt für Schritt | `K8s-lernen-verstehen-verbindungen.md` Kap. 11 |
+| Mi | CRDs: was eine `Application`-Ressource intern ist, wie K8s sie verarbeitet | `helm-yaml-lernen.md` Kap. 9 |
+| Do | OutOfSync, Degraded, Health-Checks: warum sie entstehen, wie ArgoCD sie berechnet | `FEHLER-DOKU.md` alle Fehler |
+| Fr | Praxis: `kubectl get application -n argocd -o yaml` + Controller-Logs lesen — rohen ArgoCD-State verstehen | — |
 
 ---
 
-## Woche 6 — Alles zusammen
+## Woche 7 — Synthese: Alles zusammen
 
-**Ziel:** Die komplette Prozesskette von Git Push bis laufendem Pod komplett verstehen
+**Ziel:** Die komplette Prozesskette von Git Push bis laufendem Pod aus dem Kopf erklären können
 
 | Tag | Aufgabe | Quelle |
 |---|---|---|
-| Mo | Komplette Prozesskette lesen: Git Push → ArgoCD → Helm render → apply → Pod | `WIE-ALLES-ZUSAMMENHAENGT.md` Kap. 3 + 10 |
-| Di | Was passiert wenn eine Komponente ausfällt: ArgoCD down, Traefik down, cert-manager down | `WIE-ALLES-ZUSAMMENHAENGT.md` Kap. 8–9 |
-| Mi | HOW-TO-CREATE von Null lesen: gesamtes Setup nachvollziehen mit jetzt tiefem Verständnis | `HOW-TO-CREATE.md` komplett |
-| Do | Offene Fragen klären, Lücken schließen — was ist noch unklar? | alle Dateien |
-| Fr | Praxis: Neue App von Null anlegen — YAML schreiben, Helm-Chart verstehen, ArgoCD-Sync beobachten | — |
+| Mo | Komplette Prozesskette: Git Push → ArgoCD → Helm render → kubectl apply → Pod läuft | `WIE-ALLES-ZUSAMMENHAENGT.md` Kap. 3 + 10 |
+| Di | Ausfallszenarien: was passiert wenn ArgoCD, Traefik oder cert-manager ausfällt | `WIE-ALLES-ZUSAMMENHAENGT.md` Kap. 8–9 |
+| Mi | HOW-TO-CREATE komplett lesen: Setup von Null — mit jetzt tiefem Wissen alles nachvollziehen | `HOW-TO-CREATE.md` komplett |
+| Do | SETUP-DOKU Kap. 9–12: Setup-Schritte + Debugging-Referenz + kubectl-Befehle | `SETUP-DOKU.md` Kap. 9–12 |
+| Fr | Praxis: Neue App von Null — YAML schreiben, Chart verstehen, ArgoCD-Sync beobachten, Fehler selbst lösen | — |
 
 ---
 
 ## Spickzettel — Wichtige Befehle pro Woche
 
 ```bash
-# Woche 1 — K8s Internals beobachten
+# Woche 1+2 — K8s Internals beobachten
 kubectl get events -w
 kubectl describe pod <name>
 kubectl get all -A
+kubectl get cm,secret,pvc -n <namespace>
 
-# Woche 2 — Netzwerk erkunden
+# Woche 3 — Netzwerk erkunden
 kubectl exec -it <pod> -- /bin/sh
 curl http://<service>.<namespace>.svc.cluster.local
-nslookup <service>
+nslookup <service>.<namespace>.svc.cluster.local
 
-# Woche 3+4 — Helm sicher nutzen
+# Woche 4+5 — Helm sicher nutzen
 helm template <release> <chart> -f values.yaml
 helm diff upgrade <release> <chart> -f values.yaml
 helm history <release>
+helm get manifest <release>
 
-# Woche 5 — ArgoCD Internals
+# Woche 6 — ArgoCD Internals
 kubectl get application -n argocd -o yaml
 kubectl logs -n argocd deployment/argocd-application-controller
 kubectl logs -n argocd deployment/argocd-repo-server
 
-# Woche 6 — Alles zusammen
+# Woche 7 — Alles zusammen
 kubectl get events -n <namespace> --sort-by='.lastTimestamp'
 kubectl rollout status deployment/<name>
+kubectl rollout history deployment/<name>
 ```
+
+---
+
+## Was in welcher Datei steckt
+
+| Datei | Zeilen | Hauptsächlich genutzt in |
+|---|---|---|
+| `K8s-lernen-verstehen-verbindungen.md` | 1.457 | Woche 1, 2, 3, 6 |
+| `WIE-ALLES-ZUSAMMENHAENGT.md` | 1.126 | Woche 1, 3, 6, 7 |
+| `OSI-Modell.md` | 905 | Woche 3 |
+| `helm-yaml-lernen.md` | 2.898 | Woche 4, 5, 6 |
+| `FEHLER-DOKU.md` | 455 | Woche 6 |
+| `HOW-TO-CREATE.md` | 1.318 | Woche 7 |
+| `SETUP-DOKU.md` | 1.570 | Woche 1, 2, 7 |
