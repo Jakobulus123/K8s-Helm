@@ -35,4 +35,5 @@ spec:
       jqPathExpressions:
         - .spec.conversion
         - .spec.preserveUnknownFields
+        - .spec.versions[].selectableFields
         - .status
