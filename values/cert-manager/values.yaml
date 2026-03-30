@@ -1,0 +1,19 @@
+# cert-manager Helm Values
+# Doku: https://cert-manager.io/docs/installation/helm/
+
+# CRDs werden via installCRDs installiert (empfohlen für GitOps)
+crds:
+  enabled: true
+
+replicaCount: 1
+
+# Prometheus Metrics
+prometheus:
+  enabled: true
+  servicemonitor:
+    enabled: false  # auf true setzen wenn Prometheus Operator vorhanden
+
+# Leader Election
+global:
+  leaderElection:
+    namespace: cert-manager

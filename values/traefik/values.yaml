@@ -1,0 +1,49 @@
+# Traefik Helm Values
+# Doku: https://github.com/traefik/traefik-helm-chart/blob/master/traefik/values.yaml
+
+deployment:
+  replicas: 1
+
+service:
+  type: LoadBalancer
+
+ports:
+  web:
+    port: 8000
+    expose:
+      default: true
+    exposedPort: 80
+    protocol: TCP
+  websecure:
+    port: 8443
+    expose:
+      default: true
+    exposedPort: 443
+    protocol: TCP
+    tls:
+      enabled: true
+
+ingressRoute:
+  dashboard:
+    enabled: false  # Dashboard nur intern freigeben, nicht öffentlich
+
+providers:
+  kubernetesCRD:
+    enabled: true
+    allowCrossNamespaceMidTraefik: false
+  kubernetesIngress:
+    enabled: true
+
+logs:
+  general:
+    level: INFO
+  access:
+    enabled: true
+
+metrics:
+  prometheus:
+    enabled: true
+    entryPoint: metrics
+
+# cert-manager Integration
+certificatesResolvers: {}
