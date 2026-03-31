@@ -1,4 +1,4 @@
-# Das OSI-Modell — und wo Kubernetes, Traefik & ArgoCD drin stecken
+# OSI-Modell und Netzwerk — Kubernetes, Traefik und ArgoCD einordnen
 
 > Das OSI-Modell erklärt WARUM Netzwerke so funktionieren wie sie es tun.
 > Wenn du verstehst auf welcher Schicht ein Problem liegt, weißt du sofort

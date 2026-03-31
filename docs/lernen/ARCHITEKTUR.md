@@ -1,4 +1,4 @@
-# Wie alles zusammenhängt — Die komplette Prozesskette
+# Architektur — Wie alle Komponenten zusammenhängen
 
 > Diese Dokumentation erklärt WARUM jede Komponente existiert, WIE sie mit den
 > anderen kommuniziert und WAS passiert wenn eine Komponente fehlt oder kaputt ist.

@@ -1,4 +1,4 @@
-# YAML & Helm Charts lernen — Von Null bis eigene App deployen
+# YAML und Helm — Von Null bis eigene App deployen
 
 > Diese Dokumentation erklärt YAML und Helm von Grund auf — für absolute Anfänger.
 > Alle Beispiele kommen aus diesem echten Setup — nichts ist erfunden oder theoretisch.

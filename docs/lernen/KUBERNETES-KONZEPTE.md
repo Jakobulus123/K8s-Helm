@@ -1,4 +1,4 @@
-# Kubernetes lernen, verstehen & Verbindungen begreifen
+# Kubernetes Konzepte — Objekte, Prozesse und Netzwerk verstehen
 
 > Diese Dokumentation erklärt Kubernetes von Grund auf — alle Objekte, alle Prozesse,
 > alle Netzwerkkonzepte und wie alles miteinander zusammenläuft.
