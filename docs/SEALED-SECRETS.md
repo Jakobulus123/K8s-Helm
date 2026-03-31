@@ -319,13 +319,41 @@ SealedSecrets sind standardmäßig an **Namespace + Name** gebunden.
 ## 9. Checkliste
 
 ```
-[ ] apps/sealed-secrets.yaml erstellt und committed
-[ ] ArgoCD Root App gesynct
-[ ] Pod Running:  kubectl get pods -n kube-system | grep sealed
-[ ] Service-Name korrekt: sealed-secrets-controller
-[ ] kubeseal CLI installiert: kubeseal --version
-[ ] Verbindung getestet: kubeseal --fetch-cert ...
-[ ] Master Key gesichert unter ~/backups/ (nie in Git!)
-[ ] .gitignore Eintrag gesetzt
-[ ] Erstes Test-Secret erfolgreich verschlüsselt und deployed
+[x] apps/sealed-secrets.yaml erstellt und committed
+[x] ArgoCD Root App gesynct
+[x] Pod Running:  kubectl get pods -n kube-system | grep sealed
+[x] Service-Name korrekt: sealed-secrets-controller
+[x] kubeseal CLI installiert: kubeseal --version
+[x] Verbindung getestet: kubeseal --fetch-cert ...
+[x] Master Key gesichert unter ~/backups/ (nie in Git!)
+[x] .gitignore Eintrag gesetzt
+[x] Erstes Test-Secret erfolgreich verschlüsselt und deployed
+```
+
+---
+
+## 10. Installierte Versionen (Stand 2026-03-31)
+
+| Komponente | Version |
+|------------|---------|
+| Helm Chart (bitnami/sealed-secrets) | 2.5.19 |
+| Controller (APP VERSION) | 0.31.0 |
+| kubeseal CLI | 0.31.0 |
+
+### Installierte Dateien
+
+| Datei/Pfad | Zweck |
+|------------|-------|
+| `apps/sealed-secrets.yaml` | ArgoCD Application |
+| `~/backups/sealed-secrets-master-key-BACKUP.yaml` | Master Key Backup (nie in Git!) |
+| `/usr/local/bin/kubeseal` | CLI Tool |
+| `.gitignore` | Schützt vor versehentlichem Commit des Backups |
+
+### Aufgetretene Probleme bei Installation
+
+**Problem:** Chart Version `2.16.2` existiert nicht im Bitnami Repository.
+**Lösung:** Verfügbare Versionen immer vorher prüfen:
+```bash
+helm repo add bitnami https://charts.bitnami.com/bitnami
+helm search repo bitnami/sealed-secrets --versions | head -5
 ```
