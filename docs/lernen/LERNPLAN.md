@@ -186,4 +186,150 @@ kubectl rollout history deployment/<name>
 | `lernen/YAML-UND-HELM.md` | 2.898 | Woche 4, 5, 6 |
 | `troubleshooting/FEHLER-DOKU.md` | 455 | Woche 6 |
 | `setup/CLUSTER-AUFBAUEN.md` | 1.318 | Woche 7 |
-| `lernen/SETUP-DOKU.md` | 1.570 | Woche 1, 2, 7 |\n| `setup/SEALED-SECRETS.md` | 359 | Zusatz: Secrets sicher in Git verwalten |
+| `lernen/SETUP-DOKU.md` | 1.570 | Woche 1, 2, 7 |
+| `setup/SEALED-SECRETS.md` | 359 | Zusatz: Secrets sicher in Git verwalten |
+
+---
+
+## Add-on: Tägliche Wiederholung (1 Stunde zuhause)
+
+> Der 7-Wochen-Plan bleibt unverändert — dieser Block ist ein paralleles System
+> das abends zuhause läuft. Ziel: was tagsüber neu gelernt wurde, abends festigen.
+> Kein neuer Stoff. Nur Wiederholung und Verständnis vertiefen.
+
+### Das Prinzip
+
+Spaced Repetition: neues Wissen vergisst man schnell wenn man es nicht wiederholt.
+Die erste Wiederholung am selben Abend ist die wichtigste — danach sinkt die Kurve langsamer.
+
+```
+Tag 0 (Arbeit):    Neues Thema lernen
+Tag 0 (Abend):     Wiederholung des heutigen Themas       ← wichtigste Wiederholung
+Tag 1 (Abend):     Wiederholung von gestern + vorgestern
+Tag 3 (Abend):     Wochenthemen nochmal komplett
+Tag 7 (Abend):     Woche komplett zusammenfassen
+```
+
+### Die 1 Stunde aufteilen
+
+| Zeit | Aktivität |
+|------|-----------|
+| 0–15 min | Heutiges Thema nochmal lesen (nur Überschriften + Code-Blöcke) |
+| 15–35 min | Aus dem Kopf erklären — was war das Thema? Wie funktioniert es? |
+| 35–50 min | Am Cluster nachvollziehen (kubectl, ArgoCD UI, Logs lesen) |
+| 50–60 min | Eine offene Frage aufschreiben die noch unklar ist |
+
+### Was "aus dem Kopf erklären" bedeutet
+
+Nicht nochmal lesen. Stattdessen:
+- Dokument schließen
+- In eigenen Worten aufschreiben oder laut erklären was du heute gelernt hast
+- Dann Dokument öffnen und prüfen was du vergessen hast
+
+Was du vergessen hast → das ist genau das was du morgen nochmal liest.
+
+### Wiederholungsplan pro Woche
+
+**Woche 1 — Control Plane**
+
+| Abend | Wiederhole |
+|-------|-----------|
+| Mo-Abend | API-Server + etcd — wie kommunizieren sie? |
+| Di-Abend | etcd + Scheduler — was speichert etcd, wie wählt der Scheduler? |
+| Mi-Abend | Mo + Di zusammen — Reconciliation Loop von Anfang bis Ende erklären |
+| Do-Abend | Reconciliation Loop + was passiert bei `kubectl apply`? |
+| Fr-Abend | Ganze Woche: Control Plane komplett aus dem Kopf skizzieren |
+
+**Woche 2 — Workloads**
+
+| Abend | Wiederhole |
+|-------|-----------|
+| Mo-Abend | Deployment → ReplicaSet → Pod — Hierarchie erklären |
+| Di-Abend | ConfigMap vs. Secret — Unterschied, wie sie in Pods landen |
+| Mi-Abend | PVC/PV — was passiert wenn ein Pod neu startet? |
+| Do-Abend | RBAC — wer darf was, ServiceAccount erklären |
+| Fr-Abend | Woche 1 + 2 zusammen — alle Objekte und ihre Beziehungen |
+
+**Woche 3 — Netzwerk**
+
+| Abend | Wiederhole |
+|-------|-----------|
+| Mo-Abend | OSI-Schichten 1–4 aus dem Kopf — was passiert auf welcher Schicht? |
+| Di-Abend | kube-proxy: wie kommt ein Request von ClusterIP zum Pod? |
+| Mi-Abend | ClusterIP vs. NodePort vs. LoadBalancer — wann welcher? |
+| Do-Abend | Traefik: Request kommt rein — was passiert Schritt für Schritt? |
+| Fr-Abend | Kompletter Netzwerkweg: Browser → DNS → Traefik → Service → Pod |
+
+**Woche 4 — Helm Basics**
+
+| Abend | Wiederhole |
+|-------|-----------|
+| Mo-Abend | YAML: 3 Fallstricke aufschreiben die du heute gelernt hast |
+| Di-Abend | Was ist ein Helm Chart? Struktur aus dem Kopf zeichnen |
+| Mi-Abend | Chart.yaml + values.yaml + templates/ — was liegt wo und warum? |
+| Do-Abend | `helm template` ausführen und Output einem K8s-Objekt zuordnen |
+| Fr-Abend | Woche 4 gesamt: was macht Helm intern wenn du `helm install` rufst? |
+
+**Woche 5 — Helm Advanced**
+
+| Abend | Wiederhole |
+|-------|-----------|
+| Mo-Abend | Go-Template: ein einfaches `{{ if }}` und `{{ range }}` selbst schreiben |
+| Di-Abend | Helm Hooks: Reihenfolge aufschreiben (pre-install → install → post-install) |
+| Mi-Abend | Einen Helm-Fehler aus `FEHLER-DOKU.md` nochmal nachvollziehen |
+| Do-Abend | Einen fremden Chart öffnen und 3 Dinge erklären was er macht |
+| Fr-Abend | Woche 4 + 5: `helm template` → Output → was applyt ArgoCD davon? |
+
+**Woche 6 — ArgoCD**
+
+| Abend | Wiederhole |
+|-------|-----------|
+| Mo-Abend | ArgoCD-Komponenten: wer macht was — ohne Nachschauen aufschreiben |
+| Di-Abend | Reconciliation Loop: Git Push → Pod läuft — alle Schritte |
+| Mi-Abend | Application-CRD: was bedeuten source, destination, syncPolicy? |
+| Do-Abend | ArgoCD UI: OutOfSync-App anschauen und Diff verstehen |
+| Fr-Abend | Woche 1–6: Komplette Prozesskette von `git push` bis `Pod Running` |
+
+**Woche 7 — Synthese**
+
+| Abend | Wiederhole |
+|-------|-----------|
+| Mo-Abend | Prozesskette nochmal — diesmal mit Zeitangaben (wie lange dauert was?) |
+| Di-Abend | Ausfallszenario: "Traefik ist weg" — was passiert? Was nicht? |
+| Mi-Abend | CLUSTER-AUFBAUEN.md: jeden Schritt lesen und erklären warum er nötig ist |
+| Do-Abend | Offene Fragen der letzten 7 Wochen nochmal nachschlagen |
+| Fr-Abend | Abschluss: die komplette Architektur aus dem Kopf skizzieren |
+
+### Cluster-Befehle für die Wiederholung
+
+Diese Befehle helfen dir dabei Theorie am echten Cluster zu verankern:
+
+```bash
+# Was läuft gerade — Überblick verschaffen
+kubectl get all -A
+
+# Reconciliation beobachten — ArgoCD live
+kubectl get application -n argocd -w
+
+# Netzwerkweg nachvollziehen
+kubectl get endpoints -A
+kubectl get svc -A
+
+# Helm was hat ArgoCD gerendert?
+kubectl get application traefik -n argocd -o jsonpath='{.status.history[0].source}'
+
+# Events der letzten Stunde
+kubectl get events -A --sort-by='.lastTimestamp' | tail -20
+
+# Logs eines Controllers lesen
+kubectl logs -n argocd deployment/argocd-application-controller --tail=50
+```
+
+### Wenn du 1 Stunde nicht schaffst
+
+10 Minuten reichen für das Minimum:
+1. Heutiges Thema — eine Überschrift lesen
+2. Die Frage beantworten: "Was ist das Kernprinzip davon?"
+3. Einen kubectl-Befehl ausführen der damit zu tun hat
+
+Besser 10 Minuten täglich als einmal pro Woche 2 Stunden.
