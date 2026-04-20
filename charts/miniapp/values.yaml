@@ -11,10 +11,9 @@ nameOverride: ""
 fullnameOverride: ""
 
 service:
-  type: NodePort
+  type: ClusterIP
   port: 80
   targetPort: 3000
-  nodePort: 30080
 
 resources: {}
   # limits:
