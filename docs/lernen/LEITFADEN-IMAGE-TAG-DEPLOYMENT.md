@@ -42,6 +42,39 @@ ArgoCD völlig egal. Das ist später wichtig fürs Verständnis.
 
 ---
 
+## Vorspann — Die Zwei-Repo-Realität
+
+Wenn du bisher nur App-Entwickler warst, ist ein `git push` = „neue Version
+beim User". In GitOps-Welt zerfällt das in **zwei unabhängige Entscheidungen**:
+
+| Entscheidung | Wo | Wie | Was passiert |
+|---|---|---|---|
+| „Ich habe neuen Code" | App-Repo (`Jakobulus123/miniapp`) | `git push` auf `main` | CI baut ein neues Image, pusht es in die Registry |
+| „Diesen neuen Stand will ich im Cluster sehen" | Chart-Repo (`Jakobulus123/K8s-Helm`) | Tag in `values.yaml` bumpen und `git push` | ArgoCD rendert das Manifest neu, Deployment bekommt neue Pods |
+
+Das sind **zwei getrennte `git push` in zwei getrennten Repos.** Solange du den
+zweiten nicht machst, ändert sich im Cluster nichts — egal wie viele Commits
+im App-Repo landen. Die Registry füllt sich mit neuen Images, und der Cluster
+sieht sie schlicht nicht.
+
+Genau das war die Ursache in unserem Debug-Fall: der App-Repo-Push hat ein
+neues Image mit UI nach GHCR gelegt, aber der Chart-Repo zeigte immer noch
+auf einen älteren Tag (oder auf `:latest`, was ArgoCD als „keine Änderung"
+wertet). Ergebnis: Pods laufen auf altem Digest, UI fehlt.
+
+Der Mental-Model-Shift für Entwickler, die auf DevOps zulaufen:
+
+- **Build** (Code → Image) und **Deploy** (Image → Cluster) sind zwei
+  verschiedene Zeitpunkte und zwei verschiedene Trigger.
+- In traditionellem Setup (Heroku, Vercel) fallen die zusammen — ein Push
+  deployed. In GitOps sind sie absichtlich getrennt, damit du *auswählen*
+  kannst, welcher Build im Cluster landet.
+- Der Preis dafür ist bewusster Arbeit: du musst aktiv sagen „diesen Tag
+  jetzt". Der Gewinn ist Kontrolle, Audit-Spur in Git und triviale Rollbacks
+  per `git revert`.
+
+---
+
 ## Teil A — Das Image
 
 ### Was ist ein Image eigentlich?
@@ -85,35 +118,71 @@ CMD ["node", "server.js"] # kein Layer, nur Config
 
 ### Wer macht das bei uns?
 
-GitHub Actions im App-Repo. Grober Ablauf:
+GitHub Actions im App-Repo. Der Workflow liegt typischerweise unter
+`.github/workflows/build.yml` im miniapp-Source-Repo. Grober Aufbau:
 
 ```yaml
+name: build-and-push
 on:
   push:
-    branches: [main]
+    branches: [main]         # Trigger: jeder Push auf main
+
 jobs:
   build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write        # Schreibrecht auf GHCR
     steps:
       - uses: actions/checkout@v4
+
       - uses: docker/login-action@v3
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
+
       - uses: docker/build-push-action@v5
         with:
+          context: .
           push: true
           tags: |
-            ghcr.io/jakobulus123/miniapp:latest
-            ghcr.io/jakobulus123/miniapp:${{ github.sha }}
+            ghcr.io/${{ github.repository_owner }}/miniapp:latest
+            ghcr.io/${{ github.repository_owner }}/miniapp:${{ github.sha }}
 ```
 
 Nach jedem Push auf `main` liegt in GHCR dann:
-- `miniapp:latest` (überschrieben)
-- `miniapp:<commit-sha>` (neu)
+- `miniapp:latest` — überschrieben, zeigt jetzt auf den frischen Digest
+- `miniapp:<commit-sha>` — neu angelegt, zeigt auf denselben Digest
 
-Genau deshalb haben wir in der Registry Tags wie
-`6445eabc66585128a1d8ee187bbc01a80b52bd6f` — das sind Commit-SHAs.
+**Konkret in unserer Registry** (Stand dieser Session):
+
+```
+ghcr.io/jakobulus123/miniapp
+├── :latest              → sha256:2f2bbff4…   (neu, mit UI)
+├── :6445eabc…           → sha256:2f2bbff4…   (≙ :latest — neuer Commit)
+└── :c1e93196…           → sha256:f4540d65…   (alter Commit, kein UI)
+```
+
+Der SHA-Tag `6445eabc66585128a1d8ee187bbc01a80b52bd6f` ist also der
+Git-Commit-Hash des App-Repo-Stands, aus dem dieses Image gebaut wurde. Mit
+anderen Worten: Wenn du im App-Repo `git checkout 6445eabc…` machst und
+lokal `docker build` ausführst, bekommst du denselben Digest. Das ist der
+Grund, warum SHA-Tags in GitOps so wertvoll sind — sie verankern
+**Image ≡ Quellcode-Zustand**.
+
+### Wo siehst du das auf GitHub konkret?
+
+Im miniapp-Source-Repo auf github.com:
+
+- **Tab „Code"** → der Commit `6445eabc…` mit der Änderung, die jetzt live ist
+- **Tab „Actions"** → ein grüner Haken-Eintrag „build-and-push" auf diesem
+  Commit. Klick drauf → du siehst die docker-push-Log-Zeilen mit beiden Tags.
+- **User-Profil → Packages** (oder `github.com/users/Jakobulus123/packages/
+  container/miniapp`) → alle Tags und Digests, als Liste.
+
+Das **Chart-Repo** (`K8s-Helm`) weiß von alldem nichts. Es kennt nur das
+Tag-String, das du dort in `values.yaml` hinschreibst.
 
 ---
 
@@ -615,7 +684,116 @@ kubectl get certificates,challenges,orders -n <ns>
 
 ---
 
-## Teil J — Anti-Patterns (aus dieser Session gelernt)
+## Teil J — Brücke Developer → DevOps
+
+Wenn du bisher nur App-Entwickler warst, ändert GitOps deine Gewohnheiten.
+Dieser Abschnitt fasst zusammen, welche Mental-Models du mitbringen kannst
+und welche du ersetzen musst.
+
+### Was du als Entwickler schon richtig denkst
+
+- **„Code lebt in Git."** → Ja, das gilt weiter. Beide Repos (App und Chart)
+  sind Git-Repos.
+- **„Jede Änderung braucht einen Commit."** → Gilt in GitOps noch stärker:
+  Cluster-Änderungen *existieren nur als Commit*. Ohne Commit passiert
+  nichts (bzw. wird zurückgedreht).
+- **„CI baut meinen Code."** → Bleibt. Nur das Artefakt ist jetzt ein Image,
+  nicht ein npm-package oder eine jar.
+
+### Was du umlernen musst
+
+| Entwickler-Reflex | GitOps-Realität |
+|---|---|
+| „`git push` → live" | `git push` in App-Repo → **nur** Image gebaut. Live-Gehen braucht zweiten Push im Chart-Repo. |
+| „Ich editiere im Prod-Server, Quickfix" | Im Cluster direkt editieren wird von selfHeal zurückgedreht. Fix gehört in Git. |
+| „Latest ist immer aktuell" | `:latest` ist ein Name, kein Zustand. In Prod niemals benutzen. |
+| „Wenn's lokal läuft …" | Image-Digest ist die Wahrheit. Zwei Nodes können hinter demselben Tag unterschiedliche Digests fahren. |
+| „Deployment = Code bei User" | Deployment = Manifest im Cluster. Code ist nur der erste von fünf Schritten auf dem Weg dahin. |
+
+### Die zwei Rollen, die du jetzt hast
+
+In einem reinen Dev-Setup bist du nur „der, der Code schreibt". Im GitOps-
+Setup schlüpfst du in zwei Rollen:
+
+**Rolle 1: Software-Entwickler** (App-Repo)
+- Dockerfile pflegen
+- Code schreiben, lokal testen
+- `git push` → CI läuft → Image in Registry
+
+**Rolle 2: Plattform-Operator** (Chart-Repo)
+- Entscheiden: welcher Tag soll live sein?
+- `values.yaml` editieren, `git push`
+- ArgoCD beobachten, Rollouts validieren
+
+In größeren Teams sind das zwei Personen oder zwei Pull-Requests. Bei einer
+Person (wie hier) bleibst du trotzdem gut beraten, beide Rollen **bewusst**
+durchzuspielen — sonst vergisst du wie in unserer Session, dass der zweite
+Push noch fehlt.
+
+### „Wo schaue ich was an?" — Ordner-Mapping
+
+Das hier kannst du dir als Nachschlagekarte merken:
+
+| Frage | Wo guckst du? |
+|---|---|
+| Was tut der Code? | App-Repo → Source-Files |
+| Wurde das Image gebaut? | App-Repo → Actions-Tab |
+| Welche Tags gibt es? | GitHub → Packages ODER `curl ghcr.io/v2/<repo>/tags/list` |
+| Welcher Digest hinter einem Tag? | `docker manifest inspect …` oder Registry-API |
+| Welcher Tag soll im Cluster laufen? | Chart-Repo → `charts/<app>/values.yaml` |
+| Was rendert Helm daraus? | `helm template charts/<app>` lokal |
+| Ist Git = Cluster? | `kubectl get app -n argocd <app>` (Sync-Status) |
+| Welchen Digest zieht der Node wirklich? | `kubectl get pods -o jsonpath='…imageID…'` |
+| Läuft der Pod? | `kubectl get/describe/logs pod` |
+| Erreicht der Request den Pod? | `kubectl get endpoints`, Traefik-Logs |
+
+### „Zwei Commits, ein Deploy" als Ritual
+
+Merk-Sequenz für einen echten neuen Release:
+
+```
+# 1. Änderung im App-Repo
+cd ~/miniapp
+vi server.js
+git add . && git commit -m "add feature X" && git push
+# → Actions läuft, Image in GHCR fertig. SHA notieren (aus Actions-Log
+#   oder aus "git rev-parse HEAD").
+
+# 2. Tag im Chart-Repo bumpen
+cd ~/K8s-Helm
+sed -i 's/tag: .*/tag: "<neuer-sha>"/' charts/miniapp/values.yaml
+git add charts/miniapp/values.yaml
+git commit -m "bump miniapp to <kurz-sha>"
+git push
+
+# 3. ArgoCD-Sync checken
+kubectl get app -n argocd miniapp -w
+# oder im ArgoCD-UI
+```
+
+Nach Schritt 3 (spätestens ~3min oder via `refresh=hard`): neue Pods,
+neues Image, Feature live.
+
+### Was automatisieren, wenn du größer wirst?
+
+Die manuelle Tag-Bump-Choreo ist für 1-2 Services ok. Ab mehr:
+
+- **ArgoCD Image Updater**: Bot, der Schritt 2 automatisch commitet,
+  sobald ein passendes neues Image in GHCR landet. Du pflegst Regeln
+  („nimm den neuesten Semver-Tag in 1.x" oder „nimm den neuesten SHA
+  auf Branch main").
+- **Renovate / Dependabot für Container-Images**: gleiches Prinzip, aber
+  als Pull-Request statt direktem Commit. Review-freundlich.
+- **CI-seitiger Cross-Repo-Commit**: GH Action im App-Repo schreibt am
+  Ende einen Commit ins Chart-Repo (braucht Deploy-Key/PAT).
+
+Die Kernfrage ist immer dieselbe: *wer bumpt den Tag?* Du, ein Bot, oder
+die Pipeline. Solange das klar ist, bist du raus aus der „warum rollt das
+nicht aus?"-Falle.
+
+---
+
+## Teil K — Anti-Patterns (aus dieser Session gelernt)
 
 1. **`:latest` in GitOps-Manifesten.**
    ArgoCD sieht keine Änderung, während die Registry sich bewegt.
