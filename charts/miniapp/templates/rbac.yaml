@@ -12,18 +12,47 @@ metadata:
   labels:
     {{- include "miniapp.labels" . | nindent 4 }}
 rules:
-  # Lese-Rechte
+  # Cluster
   - apiGroups: [""]
-    resources: ["nodes", "pods", "pods/log", "namespaces", "services", "events"]
+    resources: ["nodes", "namespaces", "events"]
+    verbs: ["get", "list", "watch"]
+  # Workloads - Read
+  - apiGroups: [""]
+    resources: ["pods", "pods/log"]
     verbs: ["get", "list", "watch"]
   - apiGroups: ["apps"]
-    resources: ["deployments", "replicasets", "statefulsets"]
+    resources: ["deployments", "replicasets", "statefulsets", "daemonsets"]
     verbs: ["get", "list", "watch"]
-  # Schreib-Rechte: Pod restart
+  - apiGroups: ["batch"]
+    resources: ["jobs", "cronjobs"]
+    verbs: ["get", "list", "watch"]
+  # Networking
+  - apiGroups: [""]
+    resources: ["services", "endpoints"]
+    verbs: ["get", "list", "watch"]
+  - apiGroups: ["networking.k8s.io"]
+    resources: ["ingresses"]
+    verbs: ["get", "list", "watch"]
+  # Konfiguration
+  - apiGroups: [""]
+    resources: ["configmaps", "secrets", "serviceaccounts"]
+    verbs: ["get", "list", "watch"]
+  # Storage
+  - apiGroups: [""]
+    resources: ["persistentvolumeclaims", "persistentvolumes"]
+    verbs: ["get", "list", "watch"]
+  - apiGroups: ["storage.k8s.io"]
+    resources: ["storageclasses"]
+    verbs: ["get", "list", "watch"]
+  # RBAC
+  - apiGroups: ["rbac.authorization.k8s.io"]
+    resources: ["clusterroles", "clusterrolebindings"]
+    verbs: ["get", "list", "watch"]
+  # Aktionen: Pod restart
   - apiGroups: [""]
     resources: ["pods"]
     verbs: ["delete"]
-  # Schreib-Rechte: Deployment skalieren
+  # Aktionen: Deployment skalieren
   - apiGroups: ["apps"]
     resources: ["deployments/scale"]
     verbs: ["get", "patch", "update"]
