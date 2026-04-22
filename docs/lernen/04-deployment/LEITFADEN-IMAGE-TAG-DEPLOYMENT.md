@@ -2,7 +2,7 @@
 
 > Ein pädagogischer Durchlauf vom Quellcode bis zur UI im Browser.
 > Ergänzt [`IMAGE-UND-DEPLOYMENT.md`](IMAGE-UND-DEPLOYMENT.md) (Kurz-Überblick)
-> und [`DEBUG-IMAGE-TAG-PROBLEM.md`](DEBUG-IMAGE-TAG-PROBLEM.md) (konkreter Bug).
+> und [`DEBUG-IMAGE-TAG-PROBLEM.md`](../06-debug/DEBUG-IMAGE-TAG-PROBLEM.md) (konkreter Bug).
 > Ziel hier: die Kette komplett verstehen, nicht nur den Einzelfall.
 
 ---
@@ -294,7 +294,7 @@ der Cache.
 
 `Always` prüft beim **Pod-Start**, nicht im laufenden Pod. Ein 43h alter Pod
 kümmert sich nicht um neue Pushes in die Registry. Das war genau die Falle
-im Debug-Fall (siehe [`DEBUG-IMAGE-TAG-PROBLEM.md`](DEBUG-IMAGE-TAG-PROBLEM.md)).
+im Debug-Fall (siehe [`DEBUG-IMAGE-TAG-PROBLEM.md`](../06-debug/DEBUG-IMAGE-TAG-PROBLEM.md)).
 
 Um einen Re-Pull zu erzwingen, braucht man einen Pod-Neustart. Das passiert
 bei Kubernetes natürlich, wenn sich das `spec.template` des Deployments
@@ -815,9 +815,9 @@ nicht aus?"-Falle.
 ## Weiterlesen
 
 - [`IMAGE-UND-DEPLOYMENT.md`](IMAGE-UND-DEPLOYMENT.md) — kompakter Überblick
-- [`DEBUG-IMAGE-TAG-PROBLEM.md`](DEBUG-IMAGE-TAG-PROBLEM.md) — konkrete
+- [`DEBUG-IMAGE-TAG-PROBLEM.md`](../06-debug/DEBUG-IMAGE-TAG-PROBLEM.md) — konkrete
   Debug-Session zu `:latest`
-- [`ARCHITEKTUR.md`](ARCHITEKTUR.md) — Gesamt-Cluster-Aufbau
-- [`KUBERNETES-KONZEPTE.md`](KUBERNETES-KONZEPTE.md) — Objekt-Referenz
-- [`YAML-UND-HELM.md`](YAML-UND-HELM.md) — Helm-Templating vertieft
+- [`ARCHITEKTUR.md`](../02-kubernetes/ARCHITEKTUR.md) — Gesamt-Cluster-Aufbau
+- [`KUBERNETES-KONZEPTE.md`](../02-kubernetes/KUBERNETES-KONZEPTE.md) — Objekt-Referenz
+- [`YAML-UND-HELM.md`](../03-konfiguration/YAML-UND-HELM.md) — Helm-Templating vertieft
 - [`PROZESS-KETTEN.md`](PROZESS-KETTEN.md) — weitere End-to-End-Abläufe

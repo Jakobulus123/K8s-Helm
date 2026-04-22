@@ -31,11 +31,11 @@
 
 | Tag | Aufgabe | Quelle |
 |---|---|---|
-| Mo | API-Server: was er ist, warum alles über ihn läuft, wie er Anfragen validiert | [KUBERNETES-KONZEPTE.md — Kap. 2](KUBERNETES-KONZEPTE.md#2-die-control-plane--das-gehirn) |
-| Di | etcd: wo K8s seinen State speichert — warum etcd = Gehirn des Clusters | [KUBERNETES-KONZEPTE.md — Kap. 2](KUBERNETES-KONZEPTE.md#2-die-control-plane--das-gehirn) |
-| Mi | Scheduler + Controller-Manager: wer entscheidet wo Pods landen und wer sie überwacht | [KUBERNETES-KONZEPTE.md — Kap. 2–3](KUBERNETES-KONZEPTE.md#2-die-control-plane--das-gehirn) |
-| Do | Reconciliation Loop: Desired State vs. Actual State — das Kernprinzip von K8s | [KUBERNETES-KONZEPTE.md — Kap. 4](KUBERNETES-KONZEPTE.md#4-workload-objekte--was-läuft-im-cluster) |
-| Fr | Praxis: `kubectl get events -w` beim Deployment beobachten — Control Plane live sehen | [SETUP-DOKU.md — Kap. 2](SETUP-DOKU.md#2-kubernetes-architektur-im-detail) |
+| Mo | API-Server: was er ist, warum alles über ihn läuft, wie er Anfragen validiert | [KUBERNETES-KONZEPTE.md — Kap. 2](02-kubernetes/KUBERNETES-KONZEPTE.md#2-die-control-plane--das-gehirn) |
+| Di | etcd: wo K8s seinen State speichert — warum etcd = Gehirn des Clusters | [KUBERNETES-KONZEPTE.md — Kap. 2](02-kubernetes/KUBERNETES-KONZEPTE.md#2-die-control-plane--das-gehirn) |
+| Mi | Scheduler + Controller-Manager: wer entscheidet wo Pods landen und wer sie überwacht | [KUBERNETES-KONZEPTE.md — Kap. 2–3](02-kubernetes/KUBERNETES-KONZEPTE.md#2-die-control-plane--das-gehirn) |
+| Do | Reconciliation Loop: Desired State vs. Actual State — das Kernprinzip von K8s | [KUBERNETES-KONZEPTE.md — Kap. 4](02-kubernetes/KUBERNETES-KONZEPTE.md#4-workload-objekte--was-läuft-im-cluster) |
+| Fr | Praxis: `kubectl get events -w` beim Deployment beobachten — Control Plane live sehen | [SETUP-DOKU.md — Kap. 2](05-setup/SETUP-DOKU.md#2-kubernetes-architektur-im-detail) |
 
 ---
 
@@ -48,11 +48,11 @@
 
 | Tag | Aufgabe | Quelle |
 |---|---|---|
-| Mo | Deployment, ReplicaSet, Pod — wie Rolling Update intern abläuft, was passiert bei Absturz | [KUBERNETES-KONZEPTE.md — Kap. 4](KUBERNETES-KONZEPTE.md#4-workload-objekte--was-läuft-im-cluster) |
-| Di | ConfigMaps & Secrets: wie Konfiguration in Pods landet, Unterschied env vs. Volume | [KUBERNETES-KONZEPTE.md — Kap. 8](KUBERNETES-KONZEPTE.md#8-konfiguration--secrets) |
-| Mi | Storage: PersistentVolume, PVC, StorageClass — wie Daten den Pod-Neustart überleben | [KUBERNETES-KONZEPTE.md — Kap. 9](KUBERNETES-KONZEPTE.md#9-storage--persistenter-speicher) |
-| Do | RBAC: ServiceAccounts, Roles, ClusterRoles — wer darf was im Cluster | [KUBERNETES-KONZEPTE.md — Kap. 10](KUBERNETES-KONZEPTE.md#10-rbac--wer-darf-was) |
-| Fr | Praxis: `kubectl describe` auf Deployment, ConfigMap, PVC — alles was du gelesen hast live ansehen | [SETUP-DOKU.md — Kap. 3](SETUP-DOKU.md#3-wichtige-kubernetes-konzepte-und-ressourcen) + [Kap. 12](SETUP-DOKU.md#12-wichtige-kubectl-befehle-referenz) |
+| Mo | Deployment, ReplicaSet, Pod — wie Rolling Update intern abläuft, was passiert bei Absturz | [KUBERNETES-KONZEPTE.md — Kap. 4](02-kubernetes/KUBERNETES-KONZEPTE.md#4-workload-objekte--was-läuft-im-cluster) |
+| Di | ConfigMaps & Secrets: wie Konfiguration in Pods landet, Unterschied env vs. Volume | [KUBERNETES-KONZEPTE.md — Kap. 8](02-kubernetes/KUBERNETES-KONZEPTE.md#8-konfiguration--secrets) |
+| Mi | Storage: PersistentVolume, PVC, StorageClass — wie Daten den Pod-Neustart überleben | [KUBERNETES-KONZEPTE.md — Kap. 9](02-kubernetes/KUBERNETES-KONZEPTE.md#9-storage--persistenter-speicher) |
+| Do | RBAC: ServiceAccounts, Roles, ClusterRoles — wer darf was im Cluster | [KUBERNETES-KONZEPTE.md — Kap. 10](02-kubernetes/KUBERNETES-KONZEPTE.md#10-rbac--wer-darf-was) |
+| Fr | Praxis: `kubectl describe` auf Deployment, ConfigMap, PVC — alles was du gelesen hast live ansehen | [SETUP-DOKU.md — Kap. 3](05-setup/SETUP-DOKU.md#3-wichtige-kubernetes-konzepte-und-ressourcen) + [Kap. 12](05-setup/SETUP-DOKU.md#12-wichtige-kubectl-befehle-referenz) |
 
 ---
 
@@ -65,11 +65,11 @@
 
 | Tag | Aufgabe | Quelle |
 |---|---|---|
-| Mo | OSI-Modell komplett: alle 7 Schichten, wo K8s auf welcher Schicht eingreift | [OSI-NETZWERK.md — komplett](OSI-NETZWERK.md) |
-| Di | K8s-Netzwerk intern: kube-proxy, iptables-Regeln, wie ClusterIP und DNS funktionieren | [KUBERNETES-KONZEPTE.md — Kap. 5–6](KUBERNETES-KONZEPTE.md#5-netzwerk-in-kubernetes--vollständig-erklärt) |
-| Mi | Services tief: ClusterIP vs. NodePort vs. LoadBalancer — wann welcher und warum | [KUBERNETES-KONZEPTE.md — Kap. 6](KUBERNETES-KONZEPTE.md#6-services--wie-traffic-zu-pods-kommt) |
-| Do | Traefik intern: wie er IngressRoutes beobachtet, Reverse-Proxy-Mechanik, Middlewares | [ARCHITEKTUR.md — Kap. 6](ARCHITEKTUR.md#6-wie-traefik-traffic-verteilt) |
-| Fr | cert-manager intern: ACME-Challenge-Flow, wie Let's Encrypt TLS ausstellt und erneuert | [ARCHITEKTUR.md — Kap. 7](ARCHITEKTUR.md#7-wie-cert-manager-tls-zertifikate-holt) |
+| Mo | OSI-Modell komplett: alle 7 Schichten, wo K8s auf welcher Schicht eingreift | [OSI-NETZWERK.md — komplett](01-grundlagen/OSI-NETZWERK.md) |
+| Di | K8s-Netzwerk intern: kube-proxy, iptables-Regeln, wie ClusterIP und DNS funktionieren | [KUBERNETES-KONZEPTE.md — Kap. 5–6](02-kubernetes/KUBERNETES-KONZEPTE.md#5-netzwerk-in-kubernetes--vollständig-erklärt) |
+| Mi | Services tief: ClusterIP vs. NodePort vs. LoadBalancer — wann welcher und warum | [KUBERNETES-KONZEPTE.md — Kap. 6](02-kubernetes/KUBERNETES-KONZEPTE.md#6-services--wie-traffic-zu-pods-kommt) |
+| Do | Traefik intern: wie er IngressRoutes beobachtet, Reverse-Proxy-Mechanik, Middlewares | [ARCHITEKTUR.md — Kap. 6](02-kubernetes/ARCHITEKTUR.md#6-wie-traefik-traffic-verteilt) |
+| Fr | cert-manager intern: ACME-Challenge-Flow, wie Let's Encrypt TLS ausstellt und erneuert | [ARCHITEKTUR.md — Kap. 7](02-kubernetes/ARCHITEKTUR.md#7-wie-cert-manager-tls-zertifikate-holt) |
 
 **Praxis am Wochenende (optional):** `kubectl exec` in Pod, mit `curl` und `nslookup` den Netzwerkweg selbst nachverfolgen
 
@@ -84,10 +84,10 @@
 
 | Tag | Aufgabe | Quelle |
 |---|---|---|
-| Mo | YAML tief: Syntax, Typen, Einrückung, Fallstricke — die Sprache hinter allem | [YAML-UND-HELM.md — Kap. 1–2](YAML-UND-HELM.md#1-yaml--die-sprache-von-kubernetes) |
-| Di | Was Helm ist: Chart vs. Release vs. Revision, warum es existiert | [YAML-UND-HELM.md — Kap. 5](YAML-UND-HELM.md#5-was-ist-helm-und-warum-braucht-man-es) |
-| Mi | Chart-Struktur: `Chart.yaml`, `values.yaml`, `templates/` — was liegt wo und warum | [YAML-UND-HELM.md — Kap. 6](YAML-UND-HELM.md#6-helm-chart-struktur--was-ist-wo-und-warum) |
-| Do | `values.yaml` tief: Overrides, Hierarchie, `--set` vs. `-f values.yaml` | [YAML-UND-HELM.md — Kap. 8](YAML-UND-HELM.md#8-valuesyaml--das-herzstück-der-konfiguration) |
+| Mo | YAML tief: Syntax, Typen, Einrückung, Fallstricke — die Sprache hinter allem | [YAML-UND-HELM.md — Kap. 1–2](03-konfiguration/YAML-UND-HELM.md#1-yaml--die-sprache-von-kubernetes) |
+| Di | Was Helm ist: Chart vs. Release vs. Revision, warum es existiert | [YAML-UND-HELM.md — Kap. 5](03-konfiguration/YAML-UND-HELM.md#5-was-ist-helm-und-warum-braucht-man-es) |
+| Mi | Chart-Struktur: `Chart.yaml`, `values.yaml`, `templates/` — was liegt wo und warum | [YAML-UND-HELM.md — Kap. 6](03-konfiguration/YAML-UND-HELM.md#6-helm-chart-struktur--was-ist-wo-und-warum) |
+| Do | `values.yaml` tief: Overrides, Hierarchie, `--set` vs. `-f values.yaml` | [YAML-UND-HELM.md — Kap. 8](03-konfiguration/YAML-UND-HELM.md#8-valuesyaml--das-herzstück-der-konfiguration) |
 | Fr | Praxis: `helm template <chart> -f values.yaml` — Output Zeile für Zeile lesen und mit K8s-Wissen zuordnen | — |
 
 ---
@@ -98,11 +98,11 @@
 
 | Tag | Aufgabe | Quelle |
 |---|---|---|
-| Mo | Go-Templates tief: `{{ .Values.x }}`, `{{ .Release.Name }}`, `{{ if }}`, `{{ range }}`, `{{ include }}` | [YAML-UND-HELM.md — Kap. 7](YAML-UND-HELM.md#7-helm-templates--wie-variablen-funktionieren) |
-| Di | Helm Hooks: `pre-install`, `post-upgrade`, `pre-delete` — Reihenfolge und was schiefgehen kann | [YAML-UND-HELM.md — Kap. 7](YAML-UND-HELM.md#7-helm-templates--wie-variablen-funktionieren) |
-| Mi | Häufige Helm-Fehler: warum Cluster kaputtgehen, wie man es vorher erkennt | [YAML-UND-HELM.md — Kap. 13](YAML-UND-HELM.md#13-häufige-fehler-ihre-ursachen-und-lösungen) |
-| Do | Unbekannte Charts lesen: wie du einen fremden Chart ohne Doku verstehst | [YAML-UND-HELM.md — Kap. 14](YAML-UND-HELM.md#14-wie-du-unbekannte-charts-liest-und-verstehst) |
-| Fr | Helm + ArgoCD: wie ArgoCD intern `helm template` aufruft — dann eigenen Mini-Chart schreiben und testen | [YAML-UND-HELM.md — Kap. 9–10](YAML-UND-HELM.md#9-argocd-application--der-kleber-zwischen-git-und-cluster) |
+| Mo | Go-Templates tief: `{{ .Values.x }}`, `{{ .Release.Name }}`, `{{ if }}`, `{{ range }}`, `{{ include }}` | [YAML-UND-HELM.md — Kap. 7](03-konfiguration/YAML-UND-HELM.md#7-helm-templates--wie-variablen-funktionieren) |
+| Di | Helm Hooks: `pre-install`, `post-upgrade`, `pre-delete` — Reihenfolge und was schiefgehen kann | [YAML-UND-HELM.md — Kap. 7](03-konfiguration/YAML-UND-HELM.md#7-helm-templates--wie-variablen-funktionieren) |
+| Mi | Häufige Helm-Fehler: warum Cluster kaputtgehen, wie man es vorher erkennt | [YAML-UND-HELM.md — Kap. 13](03-konfiguration/YAML-UND-HELM.md#13-häufige-fehler-ihre-ursachen-und-lösungen) |
+| Do | Unbekannte Charts lesen: wie du einen fremden Chart ohne Doku verstehst | [YAML-UND-HELM.md — Kap. 14](03-konfiguration/YAML-UND-HELM.md#14-wie-du-unbekannte-charts-liest-und-verstehst) |
+| Fr | Helm + ArgoCD: wie ArgoCD intern `helm template` aufruft — dann eigenen Mini-Chart schreiben und testen | [YAML-UND-HELM.md — Kap. 9–10](03-konfiguration/YAML-UND-HELM.md#9-argocd-application--der-kleber-zwischen-git-und-cluster) |
 
 > **Die wichtigste Helm-Regel:**
 > ```
@@ -121,9 +121,9 @@
 
 | Tag | Aufgabe | Quelle |
 |---|---|---|
-| Mo | ArgoCD-Komponenten: Application Controller, Repo Server, API Server, Dex — wer macht was intern | [ARCHITEKTUR.md — Kap. 5](ARCHITEKTUR.md#5-wie-argocd-intern-funktioniert) |
-| Di | ArgoCD Reconciliation Loop: wie er Git-Zustand mit Cluster-Zustand vergleicht — Schritt für Schritt | [KUBERNETES-KONZEPTE.md — Kap. 11](KUBERNETES-KONZEPTE.md#11-argocd--gitops-erklärt) |
-| Mi | CRDs: was eine `Application`-Ressource intern ist, wie K8s sie verarbeitet | [YAML-UND-HELM.md — Kap. 9](YAML-UND-HELM.md#9-argocd-application--der-kleber-zwischen-git-und-cluster) |
+| Mo | ArgoCD-Komponenten: Application Controller, Repo Server, API Server, Dex — wer macht was intern | [ARCHITEKTUR.md — Kap. 5](02-kubernetes/ARCHITEKTUR.md#5-wie-argocd-intern-funktioniert) |
+| Di | ArgoCD Reconciliation Loop: wie er Git-Zustand mit Cluster-Zustand vergleicht — Schritt für Schritt | [KUBERNETES-KONZEPTE.md — Kap. 11](02-kubernetes/KUBERNETES-KONZEPTE.md#11-argocd--gitops-erklärt) |
+| Mi | CRDs: was eine `Application`-Ressource intern ist, wie K8s sie verarbeitet | [YAML-UND-HELM.md — Kap. 9](03-konfiguration/YAML-UND-HELM.md#9-argocd-application--der-kleber-zwischen-git-und-cluster) |
 | Do | OutOfSync, Degraded, Health-Checks: warum sie entstehen, wie ArgoCD sie berechnet | [FEHLER-DOKU.md — alle Fehler](../troubleshooting/FEHLER-DOKU.md) |
 | Fr | Praxis: `kubectl get application -n argocd -o yaml` + Controller-Logs lesen — rohen ArgoCD-State verstehen | — |
 
@@ -135,10 +135,10 @@
 
 | Tag | Aufgabe | Quelle |
 |---|---|---|
-| Mo | Komplette Prozesskette: Git Push → ArgoCD → Helm render → kubectl apply → Pod läuft | [ARCHITEKTUR.md — Kap. 3](ARCHITEKTUR.md#3-die-reise-eines-git-commits) + [Kap. 10](ARCHITEKTUR.md#10-das-vollständige-zusammenspiel) |
-| Di | Ausfallszenarien: was passiert wenn ArgoCD, Traefik oder cert-manager ausfällt | [ARCHITEKTUR.md — Kap. 8–9](ARCHITEKTUR.md#8-warum-jede-komponente-die-andere-braucht) |
+| Mo | Komplette Prozesskette: Git Push → ArgoCD → Helm render → kubectl apply → Pod läuft | [ARCHITEKTUR.md — Kap. 3](02-kubernetes/ARCHITEKTUR.md#3-die-reise-eines-git-commits) + [Kap. 10](02-kubernetes/ARCHITEKTUR.md#10-das-vollständige-zusammenspiel) |
+| Di | Ausfallszenarien: was passiert wenn ArgoCD, Traefik oder cert-manager ausfällt | [ARCHITEKTUR.md — Kap. 8–9](02-kubernetes/ARCHITEKTUR.md#8-warum-jede-komponente-die-andere-braucht) |
 | Mi | HOW-TO-CREATE komplett lesen: Setup von Null — mit jetzt tiefem Wissen alles nachvollziehen | [CLUSTER-AUFBAUEN.md — komplett](../setup/CLUSTER-AUFBAUEN.md) |
-| Do | SETUP-DOKU Kap. 9–12: Setup-Schritte + Debugging-Referenz + kubectl-Befehle | [SETUP-DOKU.md — Kap. 9](SETUP-DOKU.md#9-das-setup-schritt-für-schritt) + [Kap. 12](SETUP-DOKU.md#12-wichtige-kubectl-befehle-referenz) |
+| Do | SETUP-DOKU Kap. 9–12: Setup-Schritte + Debugging-Referenz + kubectl-Befehle | [SETUP-DOKU.md — Kap. 9](05-setup/SETUP-DOKU.md#9-das-setup-schritt-für-schritt) + [Kap. 12](05-setup/SETUP-DOKU.md#12-wichtige-kubectl-befehle-referenz) |
 | Fr | Praxis: Neue App von Null — YAML schreiben, Chart verstehen, ArgoCD-Sync beobachten, Fehler selbst lösen | — |
 
 ---
