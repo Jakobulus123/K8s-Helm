@@ -1,0 +1,14 @@
+config:
+  logLevel: info
+  argocd:
+    grpcWeb: true
+    serverAddress: "argocd-server.argocd.svc.cluster.local"
+    insecure: false
+    plaintext: false
+
+extraArgs:
+  - "--interval"
+  - "2m"
+
+serviceAccount:
+  create: true
