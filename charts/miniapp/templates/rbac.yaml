@@ -8,27 +8,36 @@ metadata:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  name: {{ include "miniapp.fullname" . }}-reader
+  name: {{ include "miniapp.fullname" . }}-manager
   labels:
     {{- include "miniapp.labels" . | nindent 4 }}
 rules:
+  # Lese-Rechte
   - apiGroups: [""]
-    resources: ["nodes", "pods", "namespaces", "services"]
+    resources: ["nodes", "pods", "pods/log", "namespaces", "services", "events"]
     verbs: ["get", "list", "watch"]
   - apiGroups: ["apps"]
     resources: ["deployments", "replicasets", "statefulsets"]
     verbs: ["get", "list", "watch"]
+  # Schreib-Rechte: Pod restart
+  - apiGroups: [""]
+    resources: ["pods"]
+    verbs: ["delete"]
+  # Schreib-Rechte: Deployment skalieren
+  - apiGroups: ["apps"]
+    resources: ["deployments/scale"]
+    verbs: ["get", "patch", "update"]
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  name: {{ include "miniapp.fullname" . }}-reader
+  name: {{ include "miniapp.fullname" . }}-manager
   labels:
     {{- include "miniapp.labels" . | nindent 4 }}
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: {{ include "miniapp.fullname" . }}-reader
+  name: {{ include "miniapp.fullname" . }}-manager
 subjects:
   - kind: ServiceAccount
     name: {{ include "miniapp.fullname" . }}
