@@ -16,6 +16,100 @@ Im Cluster lief ein **älteres** Image, als in der Registry lag:
 
 Die Pods waren 43h alt und hatten nie ein neues Image gezogen.
 
+## Image-Tags — was sie eigentlich sind
+
+Ein Image besteht aus zwei Arten von Adressen:
+
+```
+ghcr.io/jakobulus123/miniapp:latest
+                             ^^^^^^
+                             Tag  =  menschenlesbares Label, mutable
+
+ghcr.io/jakobulus123/miniapp@sha256:2f2bbff4d5ed2218eadaa91b...
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                             Digest =  SHA-Hash des Image-Inhalts, immutable
+```
+
+**Der Digest ist die Wahrheit.** Er ist der SHA256 über den tatsächlichen
+Image-Content (Layer, Manifest, Config). Bekommst du zweimal denselben Digest,
+hast du byte-identischen Inhalt.
+
+**Der Tag ist nur ein Zeiger** auf einen Digest. In der Registry liegt im
+Grunde eine Tabelle:
+
+| Tag | zeigt auf Digest |
+|---|---|
+| `latest` | `sha256:2f2bbff4…` |
+| `v1.0.0` | `sha256:2f2bbff4…` |
+| `6445eabc…` | `sha256:2f2bbff4…` |
+| `c1e93196…` | `sha256:f4540d65…` |
+
+Ein `docker push :latest` überschreibt einfach den Eintrag in der Tabelle —
+der alte Digest bleibt abrufbar, aber das Label `latest` zeigt jetzt woanders
+hin. *Das* ist was Tags „mutable" macht.
+
+### Welche Tag-Arten gibt es und wann helfen sie?
+
+| Tag-Typ | Beispiel | Mutable? | Gut für … | Problem |
+|---|---|---|---|---|
+| `:latest` | `:latest` | ja | lokale Experimente | zeigt *irgendwohin*, Prod-Gift |
+| Umgebung | `:stable`, `:prod` | ja | manuelle Promotion | kein Audit, Rollback-Hölle |
+| Branch | `:main`, `:feature-x` | ja | CI-Preview-Deploys | jeder Push verschiebt's |
+| Datum | `:2026-04-22` | ja¹ | Nightly-Builds | Kollisionen bei 2 Builds/Tag |
+| Semver | `:v1.2.3` | konventionell nein | Releases, Humans | Konvention, keine Garantie |
+| Commit SHA | `:6445eabc…` | de-facto nein | CI, GitOps | lang, nicht hübsch |
+| Digest | `@sha256:2f2bbff4…` | garantiert nein | kritische Prod | unleserlich, kein Rollback-Pfad |
+
+¹ *Technisch überschreibbar wie jedes Tag — nur Konvention hält einen davon ab.*
+
+### Warum nicht einfach alles mit `:latest`?
+
+Das Tag selbst ist nicht kaputt — es macht genau das, was draufsteht: „zeig auf
+den neuesten Push". Problematisch wird es, sobald **Entscheidungen davon
+abhängen**, die Reproduzierbarkeit brauchen:
+
+- **Cache-Verhalten**: Der Node zieht ein Image mit Tag `:latest` einmal und
+  cacht den Digest. Selbst `imagePullPolicy: Always` hilft nur *beim
+  Pod-Start* — ein Pod, der schon läuft, kümmert sich nicht um neue Pushes.
+  → Zwei Pods mit gleichem Tag können unterschiedliche Digests fahren.
+- **Rollback undefiniert**: „Version von gestern" — welcher Digest war das?
+  Ohne Aufzeichnung weg.
+- **Drift zwischen Environments**: Staging hat `:latest` von Dienstag,
+  Prod von Montag. Keiner merkt's, bis was knallt.
+- **GitOps-Sync-Lüge**: ArgoCD sagt „Synced", weil im Git `:latest` steht und
+  im Cluster `:latest` läuft. Dass *hinter* `:latest` zwei verschiedene
+  Digests stehen, interessiert den Differ nicht.
+- **Keine Audit-Spur**: Du kannst nicht aus `git log` rekonstruieren, welcher
+  Build wann lief.
+
+### Warum nicht einfach immer Digests (`@sha256:…`)?
+
+Digests sind maximal korrekt, aber unpraktisch:
+
+- 64-Hex-Zeichen — niemand tippt das freiwillig.
+- Man sieht nicht, *welche* Version gemeint ist (ist das v1.2.3 oder v1.2.4?).
+- Rollback heißt „alten Digest raussuchen" — kein semantischer Pfad zurück.
+
+**In der Praxis nimmt man Tags als menschenlesbare Zeiger und verlässt sich
+auf Konvention für Immutability.** Semver-Tags (`:v1.2.3`) oder Commit-SHAs
+werden nach dem ersten Push nicht überschrieben, selbst wenn die Registry das
+technisch erlauben würde. Für besonders kritische Deploys pinnt man
+zusätzlich den Digest (`image:tag@sha256:…` — Tag für Lesbarkeit, Digest für
+Garantie).
+
+### Faustregeln
+
+- **Lokal / Dev-Maschine**: `:latest` ist ok — du willst eh immer das Neueste.
+- **CI-Builds / PR-Previews**: Commit-SHA oder Branch-Name — eindeutig pro Build.
+- **Staging / Prod via GitOps**: Commit-SHA oder Semver, nie `:latest`. Jeder
+  Deploy ist ein Git-Commit, der den Tag bumpt.
+- **Sicherheitskritisch**: Digest-Pinning dazu.
+
+Der Rest dieser Doku geht davon aus, dass „Tag benutzen" = Commit-SHA-Tag
+heißt. Daher hat der Fix weiter unten `tag: "6445eabc…"` statt `tag: "v1.0.0"` —
+mit einer GitHub Action, die pro Commit baut, fällt einem der SHA-Tag
+praktisch in den Schoß.
+
 ## Warum zieht ArgoCD nicht automatisch das neue `:latest`?
 
 Das ist der zentrale Denkfehler. **ArgoCD synct Manifest-Stand, nicht Image-Stand.**
