@@ -64,8 +64,12 @@ Konkrete Bugs, warum sie passiert sind, wie sie gefixt wurden.
 
 ### [`07-sicherheit/`](07-sicherheit/) — Cluster-Härtung
 
-Welche Ports dürfen offen sein, welche nicht, und wie man das prüft.
+Wie man einen Linux-Host und einen Kubernetes-Cluster von 0 auf 100 %
+absichert, mit konkretem Audit als Beispiel.
 
+- [`HAERTUNG-LINUX-UND-K8S.md`](07-sicherheit/HAERTUNG-LINUX-UND-K8S.md) —
+  pädagogischer Leitfaden: Mental Model, 1–100 %-Skala, Linux-Basis,
+  K8s-Basis, fortgeschrittene Härtung, aktueller Stand unseres Clusters.
 - [`PORT-AUDIT.md`](07-sicherheit/PORT-AUDIT.md) — konkreter Port-Audit des
   Masters, Risiko-Bewertung pro Port (etcd, kubelet, apiserver, …) und
   priorisierte Fix-Reihenfolge inkl. UFW-Setup.
