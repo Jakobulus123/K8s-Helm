@@ -62,6 +62,14 @@ Konkrete Bugs, warum sie passiert sind, wie sie gefixt wurden.
   Pods laufen auf altem Image, obwohl `:latest` in der Registry neuer ist.
   Warum GitOps dabei nichts merkt und was der richtige Fix ist.
 
+### [`07-sicherheit/`](07-sicherheit/) — Cluster-Härtung
+
+Welche Ports dürfen offen sein, welche nicht, und wie man das prüft.
+
+- [`PORT-AUDIT.md`](07-sicherheit/PORT-AUDIT.md) — konkreter Port-Audit des
+  Masters, Risiko-Bewertung pro Port (etcd, kubelet, apiserver, …) und
+  priorisierte Fix-Reihenfolge inkl. UFW-Setup.
+
 ---
 
 ## Vorschlag für die Lese-Reihenfolge
