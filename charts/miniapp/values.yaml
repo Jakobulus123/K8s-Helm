@@ -4,7 +4,7 @@ replicaCount: 2
 image:
   repository: ghcr.io/jakobulus123/miniapp
   pullPolicy: IfNotPresent
-  tag: "6c14f948eade63cf0e6a264a0a83783629395926"
+  tag: "8b12dd9ee091170ae9a5224fc2bfbd79cc9443de"
 nameOverride: ""
 fullnameOverride: ""
 service:
